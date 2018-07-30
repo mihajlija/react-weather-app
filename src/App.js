@@ -5,10 +5,7 @@ class App extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      name: '',
-      temp: '',
-      wind: '',
-      humidity: ''
+      city: []
     }
     this.getCity = this.getCity.bind(this)
     this.setResponse = this.setResponse.bind(this)
@@ -19,11 +16,14 @@ class App extends Component {
   }
 
   setResponse (myJson) {
-    this.setState({
+    let obj = {
       name: myJson.name,
       temp: myJson.main.temp,
       wind: myJson.wind.speed,
       humidity: myJson.main.humidity
+    }
+    this.setState({
+      city: [...this.state.city, obj]
     })
   }
 
@@ -41,15 +41,35 @@ class App extends Component {
   componentDidMount () {}
 
   render () {
+    const arr = this.state.city
     return (
       <div className='App'>
         <header className='App-header'>
           <input type='text' id='input' onKeyDown={this.handleEnter} />
         </header>
-        <h1>{this.state.temp ? `${this.state.temp} C` : ''}</h1>
-        <p>{this.state.name}</p>
-        <p>{this.state.wind ? `wind ${this.state.wind} km/s` : ''}</p>
-        <p>{this.state.humidity ? `humidity ${this.state.humidity} %` : ''}</p>
+
+        {arr.map(city => {
+          ;<City
+            temp={city.temp}
+            name={city.name}
+            wind={city.wind}
+            humidity={city.humidity}
+          />
+        })}
+
+      </div>
+    )
+  }
+}
+
+class City extends Component {
+  render () {
+    return (
+      <div>
+        <h1>{this.prop.temp ? `${this.prop.temp} C` : ''}</h1>
+        <p>{this.prop.name}</p>
+        <p>{this.prop.wind ? `wind ${this.prop.wind} km/s` : ''}</p>
+        <p>{this.prop.humidity ? `humidity ${this.prop.humidity} %` : ''}</p>
       </div>
     )
   }
