@@ -10,11 +10,14 @@ class App extends Component {
   }
 
   getWeather = city => {
+    // const call = city;
     fetch(
       `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&APPID=171fb93bde138475dbc8d8d90938ac48`
     )
       .then(response => response.json())
-      .then(myJson => this.setResponse(myJson))
+      .then(myJson => {
+        this.setResponse(myJson)
+      })
       .catch(() => this.setError(city))
   }
 
@@ -26,10 +29,29 @@ class App extends Component {
       humidity: myJson.main.humidity,
       desc: myJson.weather[0].description
     }
-    this.setState({
-      cities: [...this.state.cities, obj],
-      error: ''
+    const city = myJson.name.toLowerCase()
+    this.setState(
+      {
+        cities: this.state.cities.map(x => {
+          if (x.key == city) {
+            obj.key = city
+            obj.data = true
+            console.log(obj)
+            return obj
+          } else return x
+        }),
+        error: ''
+      },
+      () => console.log(this.state)
+    )
+  }
+
+  setPlaceholder = arr => {
+    let cities = arr.map(city => {
+      let bb = { key: city, data: false, error: '' }
+      return bb
     })
+    this.setState({ cities: cities })
   }
 
   setError = city => {
@@ -49,7 +71,7 @@ class App extends Component {
 
   filterCities = arr => {
     let a = [...new Set(arr)] // create set from input array (keeps only unique elements)
-    let b = this.state.cities.map(city => city.name.toLowerCase())
+    let b = this.state.cities.map(city => city.key.toLowerCase())
     let c = new Set(b) // transfrom array of previously entered cities into a set
     return a.filter(city => !c.has(city)) // use has() method to filter out cities that are already displayed
   }
@@ -58,9 +80,10 @@ class App extends Component {
     if (e.keyCode === 13) {
       if (e.target.value) {
         let input = e.target.value.toLowerCase()
-        // set cities into state
         let arr = this.splitCitiesString(input)
         let filtered = this.filterCities(arr)
+        // set cities into state
+        this.setPlaceholder(filtered)
         // match data to cities
         filtered.map(city => this.getWeather(city))
 
