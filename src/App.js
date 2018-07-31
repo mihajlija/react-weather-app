@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
 import './App.css'
 
 class App extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      city: []
+      cities: []
     }
   }
 
@@ -27,9 +26,8 @@ class App extends Component {
       humidity: myJson.main.humidity,
       visibility: true
     }
-    let name = myJson.name
     this.setState({
-      city: [...this.state.city, obj],
+      cities: [...this.state.cities, obj],
       error: ''
     })
   }
@@ -40,7 +38,7 @@ class App extends Component {
       error: `Sorry, no ${city} here`
     }
     this.setState({
-      city: [...this.state.city, error]
+      cities: [...this.state.cities, error]
     })
   }
 
@@ -51,15 +49,16 @@ class App extends Component {
 
   filterCities = arr => {
     let a = [...new Set(arr)] // create set from input array (keeps only unique elements)
-    let b = this.state.city.map(city => city.name.toLowerCase()) // make an array of city names
-    let c = new Set(b) // transfrom that array into a set
+    let b = this.state.cities.map(city => city.name.toLowerCase())
+    let c = new Set(b) // transfrom array of previously entered cities into a set
     return a.filter(city => !c.has(city)) // use has() method to filter out cities that are already displayed
   }
 
   handleEnter = e => {
     if (e.keyCode === 13) {
       if (e.target.value) {
-        let arr = this.splitCitiesString(e.target.value)
+        let input = e.target.value.toLowerCase()
+        let arr = this.splitCitiesString(input)
         let filtered = this.filterCities(arr)
         filtered.map(city => this.getWeather(city))
         this.inputField.value = ''
@@ -67,10 +66,17 @@ class App extends Component {
     }
   }
 
-  discard = name => {}
+  discard = name => {
+    let filtered = this.state.cities.filter(
+      city => city.name.toLowerCase() != name
+    )
+    this.setState({
+      cities: filtered
+    })
+  }
 
   render () {
-    const arr = this.state.city
+    const arr = this.state.cities
     return (
       <div className='App'>
         <header className='App-header'>
@@ -84,20 +90,24 @@ class App extends Component {
             onFocus={() => (this.inputField.value = '')}
           />
         </header>
-        <main ref={node => (this.mainNode = node)}>
+        <main>
           {arr.map(
             city =>
               (city.error
-                ? <Error error={city.error} key={city.name} />
-                : city.visibility &&
-                <City
+                ? <Error
+                  error={city.error}
+                  name={city.name}
+                  key={city.name}
+                  discard={this.discard}
+                  />
+                : <City
                   key={city.name}
                   temp={city.temp}
                   name={city.name}
                   wind={city.wind}
                   humidity={city.humidity}
                   discard={this.discard}
-                    />)
+                  />)
           )}
         </main>
       </div>
@@ -106,37 +116,35 @@ class App extends Component {
 }
 
 class City extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      visibility: true
-    }
-  }
-
-  toggle = () => {
-    this.setState({
-      visibility: false
-    })
-    this.props.discard(this.props.name)
+  discard = () => {
+    this.props.discard(this.props.name.toLowerCase())
   }
 
   render () {
-    return this.state.visibility
-      ? <div className='city'>
+    return (
+      <div className='city'>
         <h1>{this.props.temp} C</h1>
         <p>{this.props.name}</p>
         <p>wind {this.props.wind} km/s</p>
-        <p>
-            humidity {this.props.humidity} %
-          </p>
-        <button onClick={this.toggle}>x</button>
+        <p>humidity {this.props.humidity}%</p>
+        <button onClick={this.discard}>x</button>
       </div>
-      : <div />
+    )
   }
 }
 
-const Error = props => {
-  return <p className='error'>{props.error}</p>
+class Error extends Component {
+  discard = () => {
+    this.props.discard(this.props.name.toLowerCase())
+  }
+  render () {
+    return (
+      <div>
+        <p className='error'>{this.props.error}</p>
+        <button onClick={this.discard}>x</button>
+      </div>
+    )
+  }
 }
 
 export default App
