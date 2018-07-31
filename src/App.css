@@ -31,7 +31,10 @@ input[type="text"] {
   border: none;
   padding: 0.5em;
   color: white;
+}
 
+input::placeholder{
+  color: white;
 }
 
 main {
