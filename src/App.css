@@ -22,6 +22,21 @@
   font-size: large;
 }
 
+main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 80vw;
+}
+
+.city {
+  border: 1px solid black;
+}
+
+.error {
+  border: 1px solid red;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
