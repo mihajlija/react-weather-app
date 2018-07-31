@@ -25,6 +25,7 @@ class App extends Component {
       wind: myJson.wind.speed,
       humidity: myJson.main.humidity
     }
+    let name = myJson.name
     this.setState({
       city: [...this.state.city, obj],
       error: ''
@@ -42,15 +43,23 @@ class App extends Component {
   }
 
   splitCitiesString = citiesString => {
-    return citiesString.split(',')
+    var newstr = citiesString.replace(/,\s+/gi, ',')
+    return newstr.split(',')
+  }
+
+  filterCities = arr => {
+    let a = [...new Set(arr)] // create set from input array (keeps only unique elements)
+    let b = this.state.city.map(city => city.name.toLowerCase()) // make an array of city names
+    let c = new Set(b) // transfrom that array into a set
+    return a.filter(city => !c.has(city)) // use has() method to filter out cities that are already displayed
   }
 
   handleEnter = e => {
     if (e.keyCode === 13) {
       if (e.target.value) {
-        this.splitCitiesString(e.target.value).map(city =>
-          this.getWeather(city)
-        )
+        let arr = this.splitCitiesString(e.target.value)
+        let filtered = this.filterCities(arr)
+        filtered.map(city => this.getWeather(city))
         this.inputField.value = ''
       }
     }
