@@ -21,10 +21,10 @@ class App extends Component {
   setResponse = myJson => {
     let obj = {
       name: myJson.name,
-      temp: myJson.main.temp,
+      temp: Math.round(myJson.main.temp),
       wind: myJson.wind.speed,
       humidity: myJson.main.humidity,
-      visibility: true
+      desc: myJson.weather[0].description
     }
     this.setState({
       cities: [...this.state.cities, obj],
@@ -58,17 +58,20 @@ class App extends Component {
     if (e.keyCode === 13) {
       if (e.target.value) {
         let input = e.target.value.toLowerCase()
+        // set cities into state
         let arr = this.splitCitiesString(input)
         let filtered = this.filterCities(arr)
+        // match data to cities
         filtered.map(city => this.getWeather(city))
+
         this.inputField.value = ''
       }
     }
   }
 
-  discard = name => {
+  discard = name => () => {
     let filtered = this.state.cities.filter(
-      city => city.name.toLowerCase() != name
+      city => city.name.toLowerCase() !== name.toLowerCase()
     )
     this.setState({
       cities: filtered
@@ -98,15 +101,16 @@ class App extends Component {
                   error={city.error}
                   name={city.name}
                   key={city.name}
-                  discard={this.discard}
+                  discard={this.discard(city.name)}
                   />
                 : <City
                   key={city.name}
                   temp={city.temp}
+                  desc={city.desc}
                   name={city.name}
                   wind={city.wind}
                   humidity={city.humidity}
-                  discard={this.discard}
+                  discard={this.discard(city.name)}
                   />)
           )}
         </main>
@@ -116,32 +120,32 @@ class App extends Component {
 }
 
 class City extends Component {
-  discard = () => {
-    this.props.discard(this.props.name.toLowerCase())
-  }
-
   render () {
     return (
       <div className='city'>
-        <h1>{this.props.temp} C</h1>
-        <p>{this.props.name}</p>
-        <p>wind {this.props.wind} km/s</p>
-        <p>humidity {this.props.humidity}%</p>
-        <button onClick={this.discard}>x</button>
+        <div className='left'>
+          <p className='name'>{this.props.name}</p>
+        </div>
+        <div className='mid'>
+          <h1>{this.props.temp} C</h1>
+          <p className='desc'>{this.props.desc}</p>
+        </div>
+        <div className='right'>
+          <p className='wind'>wind {this.props.wind} km/s</p>
+          <p className='humidity'>humidity {this.props.humidity}%</p>
+        </div>
+        <div className='close' onClick={this.props.discard}>x</div>
       </div>
     )
   }
 }
 
 class Error extends Component {
-  discard = () => {
-    this.props.discard(this.props.name.toLowerCase())
-  }
   render () {
     return (
       <div>
         <p className='error'>{this.props.error}</p>
-        <button onClick={this.discard}>x</button>
+        <button onClick={this.props.discard}>x</button>
       </div>
     )
   }
