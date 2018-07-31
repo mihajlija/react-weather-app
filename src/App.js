@@ -90,23 +90,19 @@ class App extends Component {
   }
 }
 
-class City extends Component {
-  render () {
-    return (
-      <div className='city'>
-        <h1>{this.props.temp ? `${this.props.temp} C` : ''}</h1>
-        <p>{this.props.name}</p>
-        <p>{this.props.wind ? `wind ${this.props.wind} km/s` : ''}</p>
-        <p>{this.props.humidity ? `humidity ${this.props.humidity} %` : ''}</p>
-      </div>
-    )
-  }
+const City = props => {
+  return (
+    <div className='city'>
+      <h1>{props.temp ? `${props.temp} C` : ''}</h1>
+      <p>{props.name}</p>
+      <p>{props.wind ? `wind ${props.wind} km/s` : ''}</p>
+      <p>{props.humidity ? `humidity ${props.humidity} %` : ''}</p>
+    </div>
+  )
 }
 
-class Error extends Component {
-  render () {
-    return <p className='error'>{this.props.error}</p>
-  }
+const Error = props => {
+  return <p className='error'>{props.error}</p>
 }
 
 export default App
