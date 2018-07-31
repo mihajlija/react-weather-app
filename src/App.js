@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
 import './App.css'
 
 class App extends Component {
@@ -23,7 +24,8 @@ class App extends Component {
       name: myJson.name,
       temp: myJson.main.temp,
       wind: myJson.wind.speed,
-      humidity: myJson.main.humidity
+      humidity: myJson.main.humidity,
+      visibility: true
     }
     let name = myJson.name
     this.setState({
@@ -65,6 +67,8 @@ class App extends Component {
     }
   }
 
+  discard = name => {}
+
   render () {
     const arr = this.state.city
     return (
@@ -80,18 +84,20 @@ class App extends Component {
             onFocus={() => (this.inputField.value = '')}
           />
         </header>
-        <main>
+        <main ref={node => (this.mainNode = node)}>
           {arr.map(
             city =>
               (city.error
                 ? <Error error={city.error} key={city.name} />
-                : <City
+                : city.visibility &&
+                <City
                   key={city.name}
                   temp={city.temp}
                   name={city.name}
                   wind={city.wind}
                   humidity={city.humidity}
-                  />)
+                  discard={this.discard}
+                    />)
           )}
         </main>
       </div>
@@ -99,15 +105,34 @@ class App extends Component {
   }
 }
 
-const City = props => {
-  return (
-    <div className='city'>
-      <h1>{props.temp ? `${props.temp} C` : ''}</h1>
-      <p>{props.name}</p>
-      <p>{props.wind ? `wind ${props.wind} km/s` : ''}</p>
-      <p>{props.humidity ? `humidity ${props.humidity} %` : ''}</p>
-    </div>
-  )
+class City extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      visibility: true
+    }
+  }
+
+  toggle = () => {
+    this.setState({
+      visibility: false
+    })
+    this.props.discard(this.props.name)
+  }
+
+  render () {
+    return this.state.visibility
+      ? <div className='city'>
+        <h1>{this.props.temp} C</h1>
+        <p>{this.props.name}</p>
+        <p>wind {this.props.wind} km/s</p>
+        <p>
+            humidity {this.props.humidity} %
+          </p>
+        <button onClick={this.toggle}>x</button>
+      </div>
+      : <div />
+  }
 }
 
 const Error = props => {
