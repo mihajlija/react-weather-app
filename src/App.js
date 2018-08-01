@@ -10,7 +10,6 @@ class App extends Component {
   }
 
   getWeather = city => {
-    // const call = city;
     fetch(
       `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&APPID=171fb93bde138475dbc8d8d90938ac48`
     )
@@ -29,38 +28,51 @@ class App extends Component {
       humidity: myJson.main.humidity,
       desc: myJson.weather[0].description
     }
-    const city = myJson.name.toLowerCase()
+
+    let key = myJson.name.toLowerCase()
+
+    let cities = this.state.cities.map(x => {
+      if (x.key === key) {
+        obj.data = true
+        obj.key = key
+        return obj
+      } else return x
+    })
     this.setState(
       {
-        cities: this.state.cities.map(x => {
-          if (x.key == city) {
-            obj.key = city
-            obj.data = true
-            console.log(obj)
-            return obj
-          } else return x
-        }),
-        error: ''
+        cities: cities
       },
-      () => console.log(this.state)
+      () => console.log('response ', this.state)
     )
   }
 
   setPlaceholder = arr => {
-    let cities = arr.map(city => {
-      let bb = { key: city, data: false, error: '' }
-      return bb
+    let input = arr.map(city => {
+      let elem = { key: city, data: false, error: '' }
+      return elem
     })
+    let cities = [...this.state.cities, ...input]
     this.setState({ cities: cities })
   }
 
   setError = city => {
     let error = {
+      key: city,
       name: city,
       error: `Sorry, no ${city} here`
     }
+
+    let key = city.toLowerCase()
+
+    let cities = this.state.cities.map(x => {
+      if (x.key === city) {
+        error.data = true
+        return error
+      } else return x
+    })
+
     this.setState({
-      cities: [...this.state.cities, error]
+      cities: cities
     })
   }
 
@@ -86,7 +98,6 @@ class App extends Component {
         this.setPlaceholder(filtered)
         // match data to cities
         filtered.map(city => this.getWeather(city))
-
         this.inputField.value = ''
       }
     }
@@ -94,7 +105,7 @@ class App extends Component {
 
   discard = name => () => {
     let filtered = this.state.cities.filter(
-      city => city.name.toLowerCase() !== name.toLowerCase()
+      city => city.key.toLowerCase() !== name.toLowerCase()
     )
     this.setState({
       cities: filtered
@@ -113,28 +124,29 @@ class App extends Component {
             placeholder='search for a city'
             onKeyDown={this.handleEnter}
             ref={input => (this.inputField = input)}
-            onFocus={() => (this.inputField.value = '')}
           />
         </header>
         <main>
           {arr.map(
             city =>
-              (city.error
-                ? <Error
-                  error={city.error}
-                  name={city.name}
-                  key={city.name}
-                  discard={this.discard(city.name)}
-                  />
-                : <City
-                  key={city.name}
-                  temp={city.temp}
-                  desc={city.desc}
-                  name={city.name}
-                  wind={city.wind}
-                  humidity={city.humidity}
-                  discard={this.discard(city.name)}
-                  />)
+              (!city.data
+                ? <Placeholder key={city.key} name={city.key} />
+                : city.error
+                    ? <Error
+                      error={city.error}
+                      name={city.name}
+                      key={city.name}
+                      discard={this.discard(city.name)}
+                      />
+                    : <City
+                      key={city.name}
+                      temp={city.temp}
+                      desc={city.desc}
+                      name={city.name}
+                      wind={city.wind}
+                      humidity={city.humidity}
+                      discard={this.discard(city.name)}
+                      />)
           )}
         </main>
       </div>
@@ -166,9 +178,24 @@ class City extends Component {
 class Error extends Component {
   render () {
     return (
-      <div>
+      <div className='city'>
         <p className='error'>{this.props.error}</p>
-        <button onClick={this.props.discard}>x</button>
+        <div className='close' onClick={this.props.discard}>x</div>
+      </div>
+    )
+  }
+}
+
+class Placeholder extends Component {
+  render () {
+    return (
+      <div className='city'>
+        <div className='left'>
+          <p className='name'>Looking for </p>
+        </div>
+        <div className='right'>
+          <h1>{this.props.name}</h1>
+        </div>
       </div>
     )
   }

@@ -33,6 +33,13 @@ input[type="text"] {
   color: white;
 }
 
+@media all and (max-width:450px) {
+  input[type="text"] {
+    height: 2em;
+    max-width: 260px;
+  }
+}
+
 input::placeholder{
   color: white;
 }
