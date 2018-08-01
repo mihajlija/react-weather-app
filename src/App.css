@@ -44,6 +44,10 @@ input::placeholder{
   color: white;
 }
 
+input:focus { outline: none; }
+
+
+
 main {
   display: flex;
   flex-wrap: wrap;
