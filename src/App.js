@@ -38,21 +38,9 @@ class App extends Component {
         return obj
       } else return x
     })
-    this.setState(
-      {
-        cities: cities
-      },
-      () => console.log('response ', this.state)
-    )
-  }
-
-  setPlaceholder = arr => {
-    let input = arr.map(city => {
-      let elem = { key: city, data: false, error: '' }
-      return elem
+    this.setState({
+      cities: cities
     })
-    let cities = [...this.state.cities, ...input]
-    this.setState({ cities: cities })
   }
 
   setError = city => {
@@ -61,8 +49,6 @@ class App extends Component {
       name: city,
       error: `Sorry, no ${city} here`
     }
-
-    let key = city.toLowerCase()
 
     let cities = this.state.cities.map(x => {
       if (x.key === city) {
@@ -76,9 +62,17 @@ class App extends Component {
     })
   }
 
+  setPlaceholder = arr => {
+    let input = arr.map(city => {
+      let elem = { key: city, data: false, error: '' }
+      return elem
+    })
+    let cities = [...this.state.cities, ...input]
+    this.setState({ cities: cities })
+  }
+
   splitCitiesString = citiesString => {
-    var newstr = citiesString.replace(/,\s+/gi, ',')
-    return newstr.split(',')
+    return citiesString.replace(/,\s+/gi, ',').split(',')
   }
 
   filterCities = arr => {
