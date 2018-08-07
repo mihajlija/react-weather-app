@@ -1,3 +1,4 @@
+# React Weather app
 
 Check weather in multiple places via OpenWeatherMap API. Use comma separated input to search for a few places at once.
 
