@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
 import './App.css'
+import City from './components/City.js'
+import Error from './components/Error.js'
+import Placeholder from './components/Placeholder.js'
+
 
 class App extends Component {
   constructor (props) {
@@ -15,12 +19,12 @@ class App extends Component {
     )
       .then(response => response.json())
       .then(myJson => {
-        this.setResponse(myJson)
+        this.setWeather(myJson)
       })
       .catch(() => this.setError(city))
   }
 
-  setResponse = myJson => {
+  setWeather = myJson => {
     let obj = {
       name: myJson.name,
       temp: Math.round(myJson.main.temp),
@@ -148,53 +152,10 @@ class App extends Component {
   }
 }
 
-class City extends Component {
-  render () {
-    return (
-      <div className='city'>
-        <div className='left'>
-          <p className='name'>{this.props.name}</p>
-        </div>
-        <div className='mid'>
-          <h1>{this.props.temp} C</h1>
-          <p className='desc'>{this.props.desc}</p>
-        </div>
-        <div className='right'>
-          <p className='wind'>wind {this.props.wind} km/s</p>
-          <p className='humidity'>humidity {this.props.humidity}%</p>
-        </div>
-        <div className='close' onClick={this.props.discard}>x</div>
-      </div>
-    )
-  }
-}
 
-class Error extends Component {
-  render () {
-    return (
-      <div className='city'>
-        <div className='mid'>
-          <p className='error'>{this.props.error}</p>
-        </div>
-        <div className='close' onClick={this.props.discard}>x</div>
-      </div>
-    )
-  }
-}
 
-class Placeholder extends Component {
-  render () {
-    return (
-      <div className='city'>
-        <div className='left'>
-          <p className='name'>Looking for </p>
-        </div>
-        <div className='right'>
-          <h1>{this.props.name}</h1>
-        </div>
-      </div>
-    )
-  }
-}
+
+
+
 
 export default App
